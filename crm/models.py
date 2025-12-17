@@ -25,8 +25,8 @@ class Customer(models.Model):
         blank=True
     )
 
-    def __str__(name):
-        return f'{name}'
+    def __str__(self):
+        return f'{self.name}'
 
 class Product(models.Model):
     product_id= models.UUIDField(
@@ -37,7 +37,7 @@ class Product(models.Model):
     )
 
     name= models.CharField(
-        max_length=100
+        max_length=100,
         blank=False
     )
     
@@ -50,8 +50,8 @@ class Product(models.Model):
         default=0
     )
 
-    def __str__(name):
-        return f'{name}'
+    def __str__(self):
+        return f'{self.name}'
 
 class Order(models.Model):
     order_id= models.UUIDField(
