@@ -12,6 +12,7 @@ class Customer(models.Model):
     )
 
     name = models.CharField(
+        max_length=100,
         blank=False
     )
 
@@ -24,6 +25,9 @@ class Customer(models.Model):
         blank=True
     )
 
+    def __str__(name):
+        return f'{name}'
+
 class Product(models.Model):
     product_id= models.UUIDField(
         primary_key=True,
@@ -33,6 +37,7 @@ class Product(models.Model):
     )
 
     name= models.CharField(
+        max_length=100
         blank=False
     )
     
@@ -44,6 +49,9 @@ class Product(models.Model):
     stock= models.PositiveIntegerField(
         default=0
     )
+
+    def __str__(name):
+        return f'{name}'
 
 class Order(models.Model):
     order_id= models.UUIDField(
@@ -65,6 +73,9 @@ class Order(models.Model):
     )
     order_date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+
+    def __str__(name):
+        return f'{name}'
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
