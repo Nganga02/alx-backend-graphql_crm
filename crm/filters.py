@@ -60,7 +60,7 @@ class ProductFilter(filters.FilterSet):
         help_text='Show products with stock below 10'
     )
 
-    ordering_by=filters.OrderingFilter(
+    order_by=filters.OrderingFilter(
         fields=['stock']
     )
 
