@@ -1,5 +1,7 @@
 import graphene
+from graphene import relay
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 from django.db import transaction, IntegrityError
 from graphql import GraphQLError
 from decimal import Decimal as PythonDecimal
@@ -8,6 +10,11 @@ from .models import (
     Customer,
     Product,
     Order
+)
+from .filters import (
+    CustomerFilter,
+    ProductFilter,
+    OrderFilter
 )
 
 class FlexibleDecimal(graphene.Scalar):
@@ -40,17 +47,23 @@ class CustomerType(DjangoObjectType):
     class Meta:
         model= Customer
         fields= '__all__'
+        interfaces=(relay.Node,)
+        
 
 class ProductType(DjangoObjectType):
     price = FlexibleDecimal()
     class Meta:
         model= Product
         fields= '__all__'
+        interfaces=(relay.Node,)
+
 
 class OrderType(DjangoObjectType):
     class Meta:
         model= Order
         fields= '__all__'
+        interfaces=(relay.Node,)
+
 
 #Declaring the input object types
 class CustomerInput(graphene.InputObjectType):
@@ -191,18 +204,70 @@ class CreateOrder(graphene.Mutation):
 
 # Query (if not already defined)
 class Query(graphene.ObjectType):
-    customers = graphene.List(CustomerType)
-    products = graphene.List(ProductType) 
-    orders = graphene.List(OrderType)
+    """
+    Query class responsible for graphql querying
+    """
+    customers = DjangoFilterConnectionField(
+        CustomerType,
+        filterset_class=CustomerFilter,
+        description="Filterable list of customers"
+    )
+    products = DjangoFilterConnectionField(
+        ProductType,
+        filterset_class=ProductFilter,
+        description="Filterable and paginated list of products"
+    ) 
+    orders = DjangoFilterConnectionField(
+        OrderType,
+        filterset_class=OrderFilter,
+        description="Filterable and paginated list of orders"
+    )
+    all_customers = DjangoFilterConnectionField(
+        CustomerType,
+        filterset_class=CustomerFilter,
+    )
+    all_products = DjangoFilterConnectionField(
+        ProductType,
+        filterset_class=ProductFilter,
+    )
+    all_orders = DjangoFilterConnectionField(
+        OrderType,
+        filterset_class=OrderFilter,
+    )
 
-    def resolve_customers(root, info):
-        return Customer.objects.all()
+    def resolve_customers(self, info, **kwargs):
+        qs = Customer.objects.all()
+        filterset = CustomerFilter(data=kwargs, queryset=qs, request=info.context)
+        return filterset.qs
 
-    def resolve_products(root, info):
-        return Product.objects.all()
+    def resolve_products(self, info, **kwargs):
+        qs = Product.objects.all()
+        filterset = ProductFilter(data=kwargs, queryset=qs, request=info.context)
+        return filterset.qs
 
-    def resolve_orders(root, info):
-        return Order.objects.all()
+    def resolve_orders(self, info, **kwargs):
+        qs = Order.objects.all()
+        filterset = OrderFilter(data=kwargs, queryset=qs, request=info.context)
+        return filterset.qs
+
+    # Resolvers with ordering support
+    def resolve_all_customers(self, info, order_by=None, **kwargs):
+        qs = Customer.objects.all()
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return CustomerFilter(data=kwargs, queryset=qs, request=info.context).qs
+
+    def resolve_all_products(self, info, order_by=None, **kwargs):
+        qs = Product.objects.all()
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return ProductFilter(data=kwargs, queryset=qs).qs
+
+    def resolve_all_orders(self, info, order_by=None, **kwargs):
+        qs = Order.objects.all()
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return OrderFilter(data=kwargs, queryset=qs).qs
 
 
 
