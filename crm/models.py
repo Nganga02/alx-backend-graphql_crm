@@ -74,11 +74,11 @@ class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
 
-    def __str__(name):
-        return f'{name}'
+    def __str__(self):
+        return f'{self.order_id}'
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.products.exists():
+        if self.product.exists():
             self.total_amount = sum(p.price for p in self.products.all())
             super().save(update_fields=['total_amount'])
