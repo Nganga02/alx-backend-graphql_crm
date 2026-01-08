@@ -1,0 +1,1 @@
+0 2 6 * * ./home/kamau/Documents/EDUCATION/programming_bckend/projects/ALX/alx-backend-graphql_crm/crm/cron_jobs/clean_inactive_customers.sh
