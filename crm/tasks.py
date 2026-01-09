@@ -6,7 +6,7 @@ import os
 
 
 
-@shared_task
+@shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=30, retry_kwargs={"max_retries": 3})
 def generate_crm_report():
     transport=RequestsHTTPTransport(
         url='http://localhost:8000/graphql/',
