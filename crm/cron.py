@@ -3,44 +3,42 @@ from gql.transport.requests import RequestsHTTPTransport
 from datetime import datetime
 
 
+def update_low_stock():
+    transport=RequestsHTTPTransport(
+        url='http://localhost:8000/graphql',
+    )
 
-transport=RequestsHTTPTransport(
-    url='http://localhost:8000/graphql',
-)
-
-client=Client(transport=transport)
+    client=Client(transport=transport)
 
 
-mutation_query=gql(
-    """
-    mutation{
-        updateLowStockProducts{
-            success
-            updatedCount
-            message
-            products {
-            name
-            stock
+    mutation_query=gql(
+        """
+        mutation{
+            updateLowStockProducts{
+                success
+                updatedCount
+                message
+                products {
+                name
+                stock
+                }
             }
         }
-    }
-"""
-)
-log_path = '/tmp/low_stock_updates_log.txt'
-try:
-    result=client.execute(mutation_query)
-    timestamp=datetime.now().isoformat()
+    """
+    )
+    log_path = '/tmp/low_stock_updates_log.txt'
+    try:
+        result=client.execute(mutation_query)
+        timestamp=datetime.now().isoformat()
 
-    payload = result["updateLowStockProducts"]
+        payload = result["updateLowStockProducts"]
 
-    if payload["success"] and payload["updatedCount"] > 0:
-        with open(log_path, "a") as log_file:
-            for product in payload["products"]:
-                log_file.write(
-                    f"[{timestamp}] Updated {product['name']} stock to {product['stock']}\n"
-                )
+        if payload["success"] and payload["updatedCount"] > 0:
+            with open(log_path, "a") as log_file:
+                for product in payload["products"]:
+                    log_file.write(
+                        f"[{timestamp}] Updated {product['name']} stock to {product['stock']}\n"
+                    )
 
-except Exception as e:
-    print("An Error occured: {e}")
-
-
+    except Exception as e:
+        print("An Error occured: {e}")
