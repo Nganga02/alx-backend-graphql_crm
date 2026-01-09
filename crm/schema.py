@@ -202,6 +202,48 @@ class CreateOrder(graphene.Mutation):
         return CreateOrderPayload(order=order)
 
 
+class UpdateLowStockProducts(graphene.Mutation):
+    class Arguments:
+        # You can add arguments later if needed (e.g., amount_to_add)
+        pass
+
+    # Return fields
+    success = graphene.Boolean()
+    updated_count = graphene.Int()
+    products = graphene.List(ProductType)
+    message = graphene.String()
+
+    @staticmethod
+    def mutate(root, info):
+        low_stock_products = list(Product.objects.filter(stock__lt=10))
+
+        if not low_stock_products:
+            return UpdateLowStockProducts(
+                success=True,
+                updated_count=0,
+                products=[],
+                message="No products with low stock found."
+            )
+
+        try:
+            updated_products = []
+            for product in low_stock_products:
+                product.stock += 10  
+                product.save()
+                updated_products.append(product)
+
+            return UpdateLowStockProducts(
+                success=True,
+                updated_count=len(updated_products),
+                products=updated_products,
+                message=f"Successfully restocked {len(updated_products)} product(s)."
+            )
+
+        except Exception as e:
+            raise GraphQLError(f"Failed to update stock: {str(e)}")
+
+
+
 # Query (if not already defined)
 class Query(graphene.ObjectType):
     """
@@ -214,7 +256,7 @@ class Query(graphene.ObjectType):
     )
     products = DjangoFilterConnectionField(
         ProductType,
-        filterset_class=ProductFilter,
+        filterset_class=ProductFilter,  
         description="Filterable and paginated list of products"
     ) 
     orders = DjangoFilterConnectionField(
@@ -277,3 +319,4 @@ class Mutation(graphene.ObjectType):
     bulk_create_customers = BulkCreateCustomers.Field()
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
+    update_low_stock_products=UpdateLowStockProducts.Field()

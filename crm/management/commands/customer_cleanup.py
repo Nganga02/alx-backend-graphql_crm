@@ -7,10 +7,11 @@ class Command(BaseCommand):
     help = "Delete customers who are marked as inactive (is_active=False)"
 
     def handle(self, *args, **options):
+        
 
         cutoff_date = timezone.now() - timedelta(days=365)
         # Count how many we are about to delete
-        to_delete = Customer.objects.filter(purchaces__order_date_lte=cutoff_date)
+        to_delete = Customer.objects.filter(purchases__order_date__lte=cutoff_date)
         count = to_delete.count()
 
         # Actually delete them

@@ -1,6 +1,5 @@
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
-from django.utils import timezone 
 from datetime import timedelta, datetime
 
 transport = RequestsHTTPTransport(
@@ -9,7 +8,7 @@ transport = RequestsHTTPTransport(
 
 
 client = Client(transport=transport)
-timeframe=timezone.now()-timedelta(days=7)
+timeframe=datetime.now()-timedelta(days=7)
 
 
 

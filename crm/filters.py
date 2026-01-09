@@ -83,6 +83,7 @@ class OrderFilter(filters.FilterSet):
     total_amount_gte=filters.NumberFilter(field_name='total_amount', lookup_expr='gte', label='totalAmountGte')
     total_amount_lte=filters.NumberFilter(field_name='total_amount', lookup_expr='lte', label='totalAmountLte')
     order_date=filters.DateTimeFromToRangeFilter()
+    
     customer_name=filters.CharFilter(field_name='customer__name', lookup_expr='icontains', label='customerName')
     product_name=filters.CharFilter(field_name='product__name', lookup_expr='icontains', label='productName')
 
