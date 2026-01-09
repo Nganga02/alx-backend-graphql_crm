@@ -3,7 +3,7 @@ from gql.transport.requests import RequestsHTTPTransport
 from datetime import timedelta, datetime
 
 transport = RequestsHTTPTransport(
-    url='http://localhost:8000/graphql',
+    url='http://localhost:8000/graphql/',
 )
 
 
@@ -14,8 +14,8 @@ timeframe=datetime.now()-timedelta(days=7)
 
 query=gql(
     """
-    query($after: Datetime!){
-        allOrders(order_date_after: $after){
+    query($after: String!){
+        allOrders(orderDate: $after){
         edges{
             node{
                 id
@@ -30,7 +30,7 @@ query=gql(
 )
 
 variables = {
-    "after": timeframe.isoformat()
+    "after": str(timeframe.isoformat())
 }
 
 result=client.execute(query, variable_values=variables)

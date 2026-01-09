@@ -80,15 +80,32 @@ class ProductFilter(filters.FilterSet):
 
 
 class OrderFilter(filters.FilterSet):
-    total_amount_gte=filters.NumberFilter(field_name='total_amount', lookup_expr='gte', label='totalAmountGte')
-    total_amount_lte=filters.NumberFilter(field_name='total_amount', lookup_expr='lte', label='totalAmountLte')
+    total_amount_gte=filters.NumberFilter(
+        field_name='total_amount',
+        lookup_expr='gte',
+        label='totalAmountGte'
+    )
+    total_amount_lte=filters.NumberFilter(
+        field_name='total_amount',
+        lookup_expr='lte',
+        label='totalAmountLte'
+    )
+    #TODO: Adding the date filters for better filtering.
     order_date=filters.DateTimeFromToRangeFilter()
     
-    customer_name=filters.CharFilter(field_name='customer__name', lookup_expr='icontains', label='customerName')
-    product_name=filters.CharFilter(field_name='product__name', lookup_expr='icontains', label='productName')
+    customer_name=filters.CharFilter(
+        field_name='customer__name',
+        lookup_expr='icontains',
+        label='customerName'
+    )
+    product_name=filters.CharFilter(
+        field_name='product__name',
+        lookup_expr='icontains',
+        label='productName'
+        )
 
     class Meta:
         model=Order
-        fields={
-            'product__product_id'
-        }
+        fields = [
+        "product__product_id"
+        ]
